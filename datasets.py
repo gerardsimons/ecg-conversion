@@ -16,6 +16,7 @@ from scipy import signal
 from torch.utils.data import Dataset
 from copy import deepcopy
 
+PTB_XL_PATH = 'data/raw/ptb_xl'
 
 class Dataset(Dataset):
 
@@ -32,13 +33,14 @@ class Dataset(Dataset):
                            'INCART/incart_data_v1.pk', 'INCART/incart_data_v2.pk', 'INCART/incart_data_v3.pk',
                            'INCART/incart_data_v4.pk', 'INCART/incart_data_v5.pk', 'INCART/incart_data_v6.pk']
         elif database=='PTB-XL':
-            files_leads = ['PTB-XL/lead_i.pk', 'PTB-XL/lead_ii.pk', 'PTB-XL/lead_iii.pk',
-                           'PTB-XL/lead_avr.pk', 'PTB-XL/lead_avl.pk', 'PTB-XL/lead_avf.pk',
-                           'PTB-XL/lead_v1.pk', 'PTB-XL/lead_v2.pk', 'PTB-XL/lead_v3.pk',
-                           'PTB-XL/lead_v4.pk', 'PTB-XL/lead_v5.pk', 'PTB-XL/lead_v6.pk']
+            files_leads = [f'{PTB_XL_PATH}/lead_i.pk', f'{PTB_XL_PATH}/lead_ii.pk', f'{PTB_XL_PATH}/lead_iii.pk',
+                           f'{PTB_XL_PATH}/lead_avr.pk', f'{PTB_XL_PATH}/lead_avl.pk', f'{PTB_XL_PATH}/lead_avf.pk',
+                           f'{PTB_XL_PATH}/lead_v1.pk', f'{PTB_XL_PATH}/lead_v2.pk', f'{PTB_XL_PATH}/lead_v3.pk',
+                           f'{PTB_XL_PATH}/lead_v4.pk', f'{PTB_XL_PATH}/lead_v5.pk', f'{PTB_XL_PATH}/lead_v6.pk']
         num_leads = len(files_leads)
         data_leads = list()
 
+        print("Loading dataset ... ")
         for file_lead_n in files_leads:
             with open(file_lead_n, 'rb') as handle:
                 data_leads.append(pk.load(handle))
@@ -69,7 +71,7 @@ class Dataset(Dataset):
         self.keys = keys
         self.fs = fs
         self.X_in, self.X_lead1, self.X_lead2, self.X_lead3, self.X_lead_avr, self.X_lead_avl, self.X_lead_avf, self.X_lead_v1, self.X_lead_v2, self.X_lead_v3, self.X_lead_v4, self.X_lead_v5, self.X_lead_v6 = self.__create_dataset__(data)
-
+        print("Loading dataset done!")
     
     def __normalisation_sqrt__(self, X):
         # Returns signals with amplitude normalised between -1 and 1

@@ -23,9 +23,10 @@ from trainers import train_model
 # Some options and parameters:
 SAVE_MODEL = "path_to_model"        # where to save the model
 
-DATABASE = 'PTB'                    # name of the database (PTB, INCART, or PTB-XL)
+DATABASE = 'PTB-XL'                    # name of the database (PTB, INCART, or PTB-XL)
 FS = 1000.0                         # data sampling frequency
-DATASET = 'train'                   # name of the dataset to get (train or test)
+# DATASET = 'train'                   # name of the dataset to get (train or test)
+DATASET = 'test'                   # name of the dataset to get (train or test)
 
 SHARED_ENC = True                   # whether or not to use a shared encoder
 LEAD_IN = 'I'                       # input lead name
@@ -42,34 +43,35 @@ REG = 0.0                           # l2-regularization factor
 # Use GPU if one is available
 DEVICE = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
+if __name__ == '__main__':
 
-dataset = Dataset(FS, database=DATABASE, lead_in=LEAD_IN, dataset=DATASET)
+    dataset = Dataset(FS, database=DATABASE, lead_in=LEAD_IN, dataset=DATASET)
 
-# create data indices for training and validation splits
-dataset_size = len(dataset)  # number of samples in training + validation sets
+    # create data indices for training and validation splits
+    dataset_size = len(dataset)  # number of samples in training + validation sets
 
-indices = list(range(dataset_size))
-split = int(np.floor(VALID_SPLIT * dataset_size))  # samples in valid. set
-np.random.shuffle(indices)
-train_indices, valid_indices = indices[split:], indices[:split]
+    indices = list(range(dataset_size))
+    split = int(np.floor(VALID_SPLIT * dataset_size))  # samples in valid. set
+    np.random.shuffle(indices)
+    train_indices, valid_indices = indices[split:], indices[:split]
 
 
-train_sampler = torch.utils.data.sampler.SubsetRandomSampler(train_indices)
-valid_sampler = torch.utils.data.sampler.SubsetRandomSampler(valid_indices)
+    train_sampler = torch.utils.data.sampler.SubsetRandomSampler(train_indices)
+    valid_sampler = torch.utils.data.sampler.SubsetRandomSampler(valid_indices)
 
-train_loader = torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE,
-                                           shuffle=False, num_workers=1,
-                                           sampler=train_sampler)
+    train_loader = torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE,
+                                               shuffle=False, num_workers=1,
+                                               sampler=train_sampler)
 
-valid_loader = torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE,
-                                           shuffle=False, num_workers=1,
-                                           sampler=valid_sampler)
+    valid_loader = torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE,
+                                               shuffle=False, num_workers=1,
+                                               sampler=valid_sampler)
 
-print('\n ======= TRAINING MODEL UNET ' + SAVE_MODEL + ' ======= \n')
+    print('\n ======= TRAINING MODEL UNET ' + SAVE_MODEL + ' ======= \n')
 
-model = UNet(shared_enc=SHARED_ENC, bilinear=True).to(DEVICE)
+    model = UNet(shared_enc=SHARED_ENC, bilinear=True).to(DEVICE)
 
-loss_fn = nn.L1Loss().to(DEVICE)
-optimiser = optim.Adam(model.parameters(), lr=LEARN_RATE, weight_decay=REG)
+    loss_fn = nn.L1Loss().to(DEVICE)
+    optimiser = optim.Adam(model.parameters(), lr=LEARN_RATE, weight_decay=REG)
 
-_ = train_model(model, loss_fn, optimiser, train_loader, N_EPOCHS, valid_loader=valid_loader, save_file=SAVE_MODEL, device=DEVICE, patience=PATIENCE)
+    _ = train_model(model, loss_fn, optimiser, train_loader, N_EPOCHS, valid_loader=valid_loader, save_file=SAVE_MODEL, device=DEVICE, patience=PATIENCE)

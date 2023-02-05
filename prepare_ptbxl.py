@@ -22,8 +22,8 @@ SAVE = 'dataset_info.pk'        # pickle in which to save info
 FOLD = [1,2,3,4,5,6,7,8,9,10]   # PTB-XL folds to use 1-10
 SHARE = 1.0                     # share of data to use [0., 1.]
 
-PTBXL_PATH = 'PTB-XL'           # path to PTB-XL folder
-
+# PTBXL_PATH = 'PTB-XL'           # path to PTB-XL folder
+PTBXL_PATH = 'data/raw/ptb_xl/'
 
 def aggregate_diagnostic(y_dic):
     tmp = []
